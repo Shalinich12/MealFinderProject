@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mealfinder</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://kit.fontawesome.com/YOUR_KIT_CODE.js" crossorigin="anonymous"></script>
+
+</head>
+<body class="bg-gray-100">
+    <!-- Navbar -->
+    <nav class="bg-orange-600 p-4 flex justify-between items-center">
+        <h1 class="text-white text-xl font-bold flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6 mr-2">
+                <!-- House (Solid) -->
+                <path fill="currentColor" d="M12 2L2 10h3v10h6v-6h2v6h6V10h3L12 2z" />
+                
+                <!-- Fork and Spoon (Cut-out Effect using White Fill) -->
+                <path fill="white" d="M9 11h1v6H9zM11 11h1v6h-1zM10 11h1v6h-1z" /> <!-- Fork -->
+                <circle cx="14" cy="7" r="1.5" fill="white" /> <!-- Spoon Head -->
+                <path fill="white" d="M14 9v8" /> <!-- Spoon Handle -->
+            </svg>
+            MEAL FINDER
+        </h1>
+                                                 
+        <button class="text-white text-2xl" onclick="toggleMenu()">&#9776;</button>
+    </nav>
+    
+    <!-- Sidebar -->
+    <div id="sidebar" class="fixed top-0 right-0 w-64 bg-white shadow-lg h-full transform translate-x-full transition-transform duration-300">
+        <button class="absolute top-4 right-4 text-xl" onclick="toggleMenu()">&#10006;</button>
+        <ul class="mt-10 p-4 space-y-2">
+            <li class="border-b p-2">Beef</li>
+            <li class="border-b p-2">Chicken</li>
+            <li class="border-b p-2">Dessert</li>
+            <li class="border-b p-2">Lamb</li>
+            <li class="border-b p-2">Miscellaneous</li>
+            <li class="border-b p-2">Pasta</li>
+            <li class="border-b p-2">Pork</li>
+            <li class="border-b p-2">Seafood</li>
+            <li class="border-b p-2">Side</li>
+            <li class="border-b p-2">Starter</li>
+            <li class="border-b p-2">Vegan</li>
+            <li class="border-b p-2">Vegetarian</li>
+            <li class="border-b p-2">Breakfast</li>
+            <li class="border-b p-2">Goat</li>
+        </ul>
+    </div>
+    
+    <!-- Hero Section -->
+    <header class="bg-cover bg-center h-64 flex flex-col justify-center items-center text-white text-center" style="background-image: url('https://source.unsplash.com/1600x900/?food');">
+        <input type="text" placeholder="Search recipes here ..." class="p-2 w-80 rounded text-gray-800">
+        <button class="bg-orange-600 p-2 mt-2 rounded">Search</button>
+    </header>
+    
+    <script src="app.js"></script>
+    </body>
+</html>
