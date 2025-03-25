@@ -7,6 +7,7 @@
 
 body {
     background: #f4f4f4;
+    position: relative;
 }
 
 header {
@@ -16,6 +17,8 @@ header {
     justify-content: space-between;
     padding: 15px 20px;
     align-items: center;
+    width: 100%;
+    position: fixed;
 }
 
 .logo {
@@ -45,7 +48,7 @@ header {
     background: #ff6600;
     color: white;
     border: none;
-    padding: 10px;
+    padding: 11px;
     cursor: pointer;
     margin-left: 5px;
     border-radius: 50%;
@@ -73,12 +76,31 @@ header {
     text-align: right;
 }
 
-#meal-list li {
+#mealList li {
     cursor: pointer;
     padding: 10px;
     border-bottom: 1px solid #ddd;
 }
+/* .meal-details p{
+    font-size: 16px;
+    padding: 10px;
+    border: 2px solid orangered;
+    border-radius: 3px;
+} */
+.meals-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 100%;
+}
+.meal-item {
+    border: 1px solid none;
+}
+.meals-container img {
+    width: 300px;
+    padding: 10px;
 
+}
 ul {
     list-style: none;
     padding: 20px 0;

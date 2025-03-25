@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // API URLs
     const categoriesAPI = "https://www.themealdb.com/api/json/v1/1/categories.php";
     const mealSearchAPI = "https://www.themealdb.com/api/json/v1/1/search.php?s=";
+    const mealByCategoryAPI = "https://www.themealdb.com/api/json/v1/1/filter.php?c=";
     const mealDetailAPI = "https://www.themealdb.com/api/json/v1/1/lookup.php?i=";
 
     // Toggle sidebar
@@ -23,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
         sidebar.classList.remove("active");
     });
 
-    // Fetch meal categories for navbar
+    // Fetch meal categories for sidebar
     async function fetchMeals() {
         try {
             const response = await fetch(categoriesAPI);
@@ -33,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
             data.categories.forEach((category) => {
                 const listItem = document.createElement("li");
                 listItem.textContent = category.strCategory;
-                listItem.addEventListener("click", () => fetchMealDescription(category.strCategory));
+                listItem.addEventListener("click", () => fetchMealsByCategory(category, true));
                 mealList.appendChild(listItem);
             });
         } catch (error) {
@@ -41,26 +42,47 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Fetch and display meal description when clicking in navbar
-    async function fetchMealDescription(category) {
+    // Fetch and display meal images for a selected category
+    async function fetchMealsByCategory(category, showDescription) {
+        if (showDescription) {
+            mealDetails.innerHTML = `
+                <h2>${category.strCategory}</h2>
+                <p><strong>Description:</strong> ${category.strCategoryDescription}</p>
+                <div id="relatedMeals" class="meal-container"></div>
+            `;
+        } else {
+            mealDetails.innerHTML = `<div id="relatedMeals" class="meal-container"></div>`;
+        }
+
+        mealDetails.style.display = "block";
+
         try {
-            const response = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?c=${category}`);
+            const response = await fetch(mealByCategoryAPI + category.strCategory);
             const data = await response.json();
-            
-            if (data.meals.length > 0) {
-                const mealId = data.meals[0].idMeal;
-                const mealDetailResponse = await fetch(mealDetailAPI + mealId);
-                const mealDetailData = await mealDetailResponse.json();
-                const mealInfo = mealDetailData.meals[0];
-                
-                mealDetails.innerHTML = `
-                    <h2>${mealInfo.strMeal}</h2>
-                    <p><strong>Description:</strong> ${mealInfo.strInstructions}</p>
-                `;
-                mealDetails.style.display = "block";
+
+            const relatedMealsContainer = document.getElementById("relatedMeals");
+            relatedMealsContainer.innerHTML = ""; // Clear previous meals
+
+            if (data.meals) {
+                data.meals.forEach((meal) => {
+                    const mealItem = document.createElement("div");
+                    mealItem.classList.add("meal-item");
+                    mealItem.innerHTML = `
+                        <img src="${meal.strMealThumb}" alt="${meal.strMeal}" data-id="${meal.idMeal}">
+                        <p>${meal.strMeal}</p>
+                    `;
+                    relatedMealsContainer.appendChild(mealItem);
+
+                    // Click on image to fetch full meal details
+                    mealItem.querySelector("img").addEventListener("click", () => {
+                        fetchMealDetails(meal.idMeal);
+                    });
+                });
+            } else {
+                relatedMealsContainer.innerHTML = "<p>No meals found for this category.</p>";
             }
         } catch (error) {
-            console.error("Error fetching meal details:", error);
+            console.error("Error fetching related meals:", error);
         }
     }
 
@@ -88,7 +110,6 @@ document.addEventListener("DOMContentLoaded", () => {
                             fetchMealDetails(meal.idMeal);
                         });
                     });
-                    mealDetails.style.display = "block";
                 } else {
                     mealDetails.innerHTML = "<p>No meals found.</p>";
                 }
@@ -135,7 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(categoriesAPI);
             const data = await response.json();
             categoriesContainer.innerHTML = "";
-    
+            
             data.categories.forEach((category) => {
                 const div = document.createElement("div");
                 div.classList.add("category");
@@ -143,6 +164,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     <img src="${category.strCategoryThumb}" alt="${category.strCategory}">
                     <p>${category.strCategory}</p>
                 `;
+                
+                div.addEventListener("click", () => fetchMealsByCategory(category, false));
                 categoriesContainer.appendChild(div);
             });
         } catch (error) {
