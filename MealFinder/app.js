@@ -43,17 +43,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Fetch and display meal images for a selected category
-    async function fetchMealsByCategory(category, showDescription) {
-        if (showDescription) {
-            mealDetails.innerHTML = `
-                <h2>${category.strCategory}</h2>
-                <p><strong>Description:</strong> ${category.strCategoryDescription}</p>
-                <div id="relatedMeals" class="meal-container"></div>
-            `;
-        } else {
-            mealDetails.innerHTML = `<div id="relatedMeals" class="meal-container"></div>`;
-        }
-
+    async function fetchMealsByCategory(category, showTitle) {
+        mealDetails.innerHTML = showTitle ? `
+        <h2>${category.strCategory}</h2>
+        <p>${category.strCategoryDescription}</p>
+        <div id="relatedMeals" class="meal-container"></div>` : `<div id="relatedMeals" class="meal-container"></div>`;
         mealDetails.style.display = "block";
 
         try {
@@ -63,28 +57,28 @@ document.addEventListener("DOMContentLoaded", () => {
             const relatedMealsContainer = document.getElementById("relatedMeals");
             relatedMealsContainer.innerHTML = ""; // Clear previous meals
 
-            if (data.meals) {
-                data.meals.forEach((meal) => {
-                    const mealItem = document.createElement("div");
-                    mealItem.classList.add("meal-item");
-                    mealItem.innerHTML = `
-                        <img src="${meal.strMealThumb}" alt="${meal.strMeal}" data-id="${meal.idMeal}">
-                        <p>${meal.strMeal}</p>
-                    `;
-                    relatedMealsContainer.appendChild(mealItem);
+            if (data.meals && data.meals.length > 0) {
+            data.meals.forEach((meal) => {
+                const mealItem = document.createElement("div");
+                mealItem.classList.add("meal-item");
+                mealItem.innerHTML = `
+                    <img src="${meal.strMealThumb}" alt="${meal.strMeal}" data-id="${meal.idMeal}">
+                    <p>${meal.strMeal}</p>
+                `;
+                relatedMealsContainer.appendChild(mealItem);
 
-                    // Click on image to fetch full meal details
-                    mealItem.querySelector("img").addEventListener("click", () => {
-                        fetchMealDetails(meal.idMeal);
-                    });
+                // Click on image to fetch full meal details
+                mealItem.querySelector("img").addEventListener("click", () => {
+                    fetchMealDetails(meal.idMeal);
                 });
-            } else {
-                relatedMealsContainer.innerHTML = "<p>No meals found for this category.</p>";
-            }
-        } catch (error) {
-            console.error("Error fetching related meals:", error);
+            });
+        } else {
+            relatedMealsContainer.innerHTML = `<p>No meals found for category: ${category.strCategory}.</p>`;
         }
+    } catch (error) {
+        console.error("Error fetching related meals:", error);
     }
+}
 
     // Search for meals and display images
     searchBtn.addEventListener("click", async () => {
