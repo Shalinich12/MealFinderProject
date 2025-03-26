@@ -122,11 +122,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Get ingredients and measurements
             let ingredientsList = "";
+            let measuresList = "";
             for (let i = 1; i <= 20; i++) {
-                const ingredient = mealInfo[`strIngredient${i}`];
-                const measure = mealInfo[`strMeasure${i}`];
-                if (ingredient && ingredient.trim() !== "") {
-                    ingredientsList += `<li>${measure} ${ingredient}</li>`;
+                const ingredient = mealInfo[`strIngredient${i}`]?.trim();
+                const measure = mealInfo[`strMeasure${i}`]?.trim();
+                if (ingredient) {
+                    ingredientsList += `<li>${ingredient}</li>`;
+                    measuresList += `<li>${measure || "None"}</li>`;
                 }
             }
 
@@ -135,7 +137,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 <img src="${mealInfo.strMealThumb}" alt="${mealInfo.strMeal}">
                 <p><strong>Category:</strong> ${mealInfo.strCategory}</p>
                 <p><strong>Instructions:</strong> ${mealInfo.strInstructions}</p>
-                <h3>Ingredients:</h3>
+                <h3><strong>Measures:</strong></h3>
+                <ul>${measuresList}</ul>
+                <h3><strong>Ingredients:</strong></h3>
                 <ul>${ingredientsList}</ul>
             `;
             mealDetails.style.display = "block";
