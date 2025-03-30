@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     const navIcon = document.querySelector(".nav-icon");
     const sidebar = document.querySelector(".sidebar");
-    const closeBtn = document.querySelector(".close-btn");
+    const closeBtn = document.querySelector(".fa-circle-xmark");
     const mealList = document.getElementById("mealList");
     const searchBtn = document.getElementById("searchBtn");
     const searchInput = document.getElementById("searchInput");
@@ -30,11 +30,13 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(categoriesAPI);
             const data = await response.json();
             mealList.innerHTML = "";
-
             data.categories.forEach((category) => {
                 const listItem = document.createElement("li");
                 listItem.textContent = category.strCategory;
-                listItem.addEventListener("click", () => fetchMealsByCategory(category, true));
+                listItem.addEventListener("click", () => {
+                    fetchMealsByCategory(category);
+                    sidebar.classList.remove("active"); // Close sidebar on meal click
+                });
                 mealList.appendChild(listItem);
             });
         } catch (error) {
@@ -43,11 +45,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Fetch and display meal images for a selected category
-    async function fetchMealsByCategory(category, showTitle) {
-        mealDetails.innerHTML = showTitle ? `
-        <h2>${category.strCategory}</h2>
-        <p>${category.strCategoryDescription}</p>
-        <div id="relatedMeals" class="meal-container"></div>` : `<div id="relatedMeals" class="meal-container"></div>`;
+    async function fetchMealsByCategory(category) {
+        mealDetails.innerHTML = `
+            <div class="category-box">
+                <h3>${category.strCategory}</h3>
+                <p>${category.strCategoryDescription}</p>
+            </div>
+            <h2>MEALS</h2>
+            <div id="relatedMeals" class="meal-container"></div>
+        `;
         mealDetails.style.display = "block";
 
         try {
@@ -55,19 +61,19 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await response.json();
 
             const relatedMealsContainer = document.getElementById("relatedMeals");
-            relatedMealsContainer.innerHTML = ""; // Clear previous meals
+            relatedMealsContainer.innerHTML = "";
 
             if (data.meals && data.meals.length > 0) {
                 data.meals.forEach((meal) => {
                     const mealItem = document.createElement("div");
                     mealItem.classList.add("meal-item");
                     mealItem.innerHTML = `
-                    <img src="${meal.strMealThumb}" alt="${meal.strMeal}" data-id="${meal.idMeal}">
-                    <p>${meal.strMeal}</p>
-                `;
+                        <img src="${meal.strMealThumb}" alt="${meal.strMeal}" data-id="${meal.idMeal}">
+                        <h3>${meal.strMeal}</h3>
+                    `;
                     relatedMealsContainer.appendChild(mealItem);
 
-                    // Click on image to fetch full meal details
+                    // Click to fetch full meal details
                     mealItem.querySelector("img").addEventListener("click", () => {
                         fetchMealDetails(meal.idMeal);
                     });
@@ -80,14 +86,15 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Search for meals and display images
+    // Search for meals
     searchBtn.addEventListener("click", async () => {
+        sidebar.classList.remove("active");
         const query = searchInput.value.trim();
         if (query !== "") {
             try {
                 const response = await fetch(mealSearchAPI + query);
                 const data = await response.json();
-                mealDetails.innerHTML = ""; // Clear previous results
+                mealDetails.innerHTML = "";
 
                 if (data.meals) {
                     data.meals.forEach((meal) => {
@@ -99,7 +106,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         `;
                         mealDetails.appendChild(mealItem);
 
-                        // Click on image to fetch full meal details
                         mealItem.querySelector("img").addEventListener("click", () => {
                             fetchMealDetails(meal.idMeal);
                         });
@@ -113,52 +119,65 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Fetch full meal details (Ingredients, Instructions, etc.)
+    // Fetch full meal details
     async function fetchMealDetails(mealId) {
         try {
             const response = await fetch(mealDetailAPI + mealId);
             const data = await response.json();
             const mealInfo = data.meals[0];
 
-            // Get ingredients and measurements
             let ingredientsList = "";
             let measuresList = "";
             for (let i = 1; i <= 20; i++) {
                 const ingredient = mealInfo[`strIngredient${i}`]?.trim();
                 const measure = mealInfo[`strMeasure${i}`]?.trim();
                 if (ingredient) {
-                    ingredientsList += `<li><span class="ingredients">${ingredient}</span></li>`;
-                    measuresList += `<li>${measure || "None"}</li>`;
+                    ingredientsList += `<li><i class="fa-solid fa-circle"></i> ${ingredient}</li>`;
+                    measuresList += `<li><i class="fa-solid fa-utensil-spoon"></i> ${measure || "None"}</li>`;
                 }
             }
 
+            const steps = mealInfo.strInstructions
+                .split(". ")
+                .map((step, index) => step ? `<li><i class="fa-solid fa-check-square"></i> Step ${index + 1}: ${step}.</li>` : "")
+                .join(" ");
+
             mealDetails.innerHTML = `
-                <h2>${mealInfo.strMeal}</h2>
-                <img src="${mealInfo.strMealThumb}" alt="${mealInfo.strMeal}">
-                <p><strong>Category:</strong> ${mealInfo.strCategory}</p>
-                <p><strong>Source:</strong> 
-                ${mealInfo.strSource ? `<a href="${mealInfo.strSource}" target="_blank">${mealInfo.strSource}</a>` : "Not Available"}
-                </p>
-                <p><strong>Tags:</strong> 
-                ${mealInfo.strTags ? mealInfo.strTags : "N/A"}
-                </p>
-                <h3><strong>Ingredients:</strong></h3>
-                <ul>${ingredientsList}</ul>
-                <h3><strong>Measures:</strong></h3>
-                <ul>${measuresList}</ul>
-                <strong>Instructions:</strong> ${mealInfo.strInstructions}        
+                <h2>MEALS DETAILS</h2>
+                <div class="meal-container1">
+                    <div class="meal-main">
+                        <img src="${mealInfo.strMealThumb}" alt="${mealInfo.strMeal}">
+                        <div class="meal-info">
+                            <h2>${mealInfo.strMeal}</h2>
+                            <p><strong>Category:</strong> ${mealInfo.strCategory}</p>
+                            <p><strong>Source:</strong> ${mealInfo.strSource ? `<a href="${mealInfo.strSource}" target="_blank">${mealInfo.strSource}</a>` : "Not Available"}</p>
+                            <p><strong>Tags:</strong> ${mealInfo.strTags ? mealInfo.strTags : "N/A"}</p>
+                            <h3>Ingredients:</h3>
+                            <ol>${ingredientsList}</ol
+                        </div>
+                    </div>
+                    <div class="meal-extra">
+                        <div class="measures">
+                            <h3>Measures:</h3> <ol>${measuresList}</ol>
+                        </div>
+                        <div class="instructions">
+                            <h3><strong>Instructions:</strong></h3>
+                            <ol class="instructions">${steps}</ol>
+                        </div>
+                    </div>
+                </div>
             `;
             mealDetails.style.display = "block";
         } catch (error) {
             console.error("Error fetching meal details:", error);
         }
     }
-
     // Fetch categories for homepage
     async function fetchCategories() {
         try {
             const response = await fetch(categoriesAPI);
             const data = await response.json();
+
             categoriesContainer.innerHTML = "";
 
             data.categories.forEach((category) => {
@@ -169,7 +188,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <p>${category.strCategory}</p>
                 `;
 
-                div.addEventListener("click", () => fetchMealsByCategory(category, false));
+                div.addEventListener("click", () => fetchMealsByCategory(category));
                 categoriesContainer.appendChild(div);
             });
         } catch (error) {
