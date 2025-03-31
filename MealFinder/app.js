@@ -14,6 +14,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const mealByCategoryAPI = "https://www.themealdb.com/api/json/v1/1/filter.php?c=";
     const mealDetailAPI = "https://www.themealdb.com/api/json/v1/1/lookup.php?i=";
 
+    document.getElementById("homeLogo").addEventListener("click", function (event) {
+        event.preventDefault(); // Prevent default anchor behavior
+        location.reload(); // Reload the page
+    });
+    
     // Toggle sidebar
     navIcon.addEventListener("click", () => {
         sidebar.classList.add("active");
@@ -132,18 +137,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 const ingredient = mealInfo[`strIngredient${i}`]?.trim();
                 const measure = mealInfo[`strMeasure${i}`]?.trim();
                 if (ingredient) {
-                    ingredientsList += `<li><i class="fa-solid fa-circle"></i> ${ingredient}</li>`;
-                    measuresList += `<li><i class="fa-solid fa-utensil-spoon"></i> ${measure || "None"}</li>`;
+                    ingredientsList += `<li class="circle"><i class="fa-solid fa-circle"></i> ${ingredient}</li>`;
+                    measuresList += `<li  class="spoon"><i class="fa-solid fa-utensil-spoon"></i> ${measure || "None"}</li>`;
                 }
             }
 
             const steps = mealInfo.strInstructions
                 .split(". ")
-                .map((step, index) => step ? `<li><i class="fa-solid fa-check-square"></i> Step ${index + 1}: ${step}.</li>` : "")
+                .map((step, index) => step ? `<li class="square"><i class="fa-solid fa-check-square"></i> Step ${index + 1}: ${step}.</li>` : "")
                 .join(" ");
 
             mealDetails.innerHTML = `
-                <h2>MEALS DETAILS</h2>
+                <h2 class="details">MEALS DETAILS</h2>
                 <div class="meal-container1">
                     <div class="meal-main">
                         <img src="${mealInfo.strMealThumb}" alt="${mealInfo.strMeal}">
@@ -151,14 +156,14 @@ document.addEventListener("DOMContentLoaded", () => {
                             <h2>${mealInfo.strMeal}</h2>
                             <p><strong>Category:</strong> ${mealInfo.strCategory}</p>
                             <p><strong>Source:</strong> ${mealInfo.strSource ? `<a href="${mealInfo.strSource}" target="_blank">${mealInfo.strSource}</a>` : "Not Available"}</p>
-                            <p><strong>Tags:</strong> ${mealInfo.strTags ? mealInfo.strTags : "N/A"}</p>
-                            <h3>Ingredients:</h3>
-                            <ol>${ingredientsList}</ol
+                            <p class="tag"><strong>Tags:</strong><span> ${mealInfo.strTags ? mealInfo.strTags : "N/A"}</span></p>
+                            <h3><strong>Ingredients:</strong></h3>
+                            <ol class="ingredients">${ingredientsList}</ol
                         </div>
                     </div>
                     <div class="meal-extra">
                         <div class="measures">
-                            <h3>Measures:</h3> <ol>${measuresList}</ol>
+                            <h3><strong>Measures:</strong></h3> <ol>${measuresList}</ol>
                         </div>
                         <div class="instructions">
                             <h3><strong>Instructions:</strong></h3>
